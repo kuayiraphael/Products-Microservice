@@ -32,7 +32,25 @@ productRoutes = (app, channel) => {
     });
     return res.json(data);
   });
+  // ~Search products with optional query and filters
+  app.get("/search", async (req, res, next) => {
+    const { q, category, minPrice, maxPrice } = req.query;
 
+    try {
+      const filters = {
+        category,
+        minPrice: minPrice ? parseFloat(minPrice) : undefined,
+        maxPrice: maxPrice ? parseFloat(maxPrice) : undefined,
+      };
+
+      const { data } = await service.SearchProducts(q, filters);
+      return res.status(200).json(data);
+    } catch (error) {
+      console.error("Error in search endpoint:", error.message);
+      return res.status(500).json({ error: "Search failed" });
+    }
+  });
+  
   app.get("/category/:type", async (req, res, next) => {
     const type = req.params.type;
 
@@ -75,7 +93,7 @@ productRoutes = (app, channel) => {
       process.env.CUSTOMER_BINDING_KEY,
       JSON.stringify(data)
     );
-    console.log(data)
+    console.log(data);
 
     res.status(200).json(data.data.product);
     //data.data.product cos payload looks like this:
@@ -111,14 +129,13 @@ productRoutes = (app, channel) => {
 
   app.put("/cart", auth, async (req, res, next) => {
     const { _id } = req.user;
-    
 
     const { data } = await service.GetProductPayload(
       _id,
       { productId: req.body._id, qty: req.body.qty },
       "ADD_TO_CART"
     );
-console.log(data)
+    console.log(data);
     PublishMessage(
       channel,
       process.env.CUSTOMER_BINDING_KEY,
