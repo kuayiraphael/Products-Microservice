@@ -7,8 +7,10 @@ const cartRoutes = require("./api/cart");
 const express = require("express");
 
 require("dotenv").config();
-
+const print = console.log;
 const app = express();
+
+const port = process.env.PORT || 8002;
 
 // Middleware
 app.use(express.json());
@@ -25,6 +27,10 @@ async function initializeApp() {
     const channel = await CreateChannel();
 
     await productRoutes(app, channel);
+    app.listen(port, () => {
+      console.log("Product Service is Listening to Port ${port}");
+    }); // Pass Redis client to routes
+
     // appEvents(app);
     app.get("/health", (req, res) => {
       res.send("Product Service Running");
@@ -37,4 +43,4 @@ async function initializeApp() {
 initializeApp();
 
 // Export the app for Vercel
-module.exports = app;
+// module.exports = app;
