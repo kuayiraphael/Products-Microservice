@@ -27,7 +27,7 @@ app.use(express.static(__dirname + "/public"));
     await productRoutes(app, channel);
     await cartRoutes(app);
     // appEvents(app);
-    app.get("/", (req, res) => {
+    app.get("/health", (req, res) => {
       res.send("Product Service Running");
     });
   } catch (err) {
