@@ -4,6 +4,8 @@ const cors = require("cors");
 const { CreateChannel } = require("./utils");
 const productRoutes = require("./api/products");
 const cartRoutes = require("./api/cart");
+const express = require("express");
+
 require("dotenv").config();
 
 const app = express();
