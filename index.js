@@ -19,19 +19,19 @@ app.use(express.static(__dirname + "/public"));
 // Initialize the app
 (async function initializeApp() {
   try {
-    await mongoose.connect(process.env.DB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
-    console.log("Connected to Product DB");
+    await mongoose.connect(process.env.DB_URI);
+    print("Connected to Product DB");
 
     const channel = await CreateChannel();
 
     await productRoutes(app, channel);
     await cartRoutes(app);
-
+    // appEvents(app);
     app.get("/", (req, res) => {
       res.send("Product Service Running");
     });
   } catch (err) {
-    console.error("Failed to initialize app:", err);
+    console.log("Failed to start app:", err);
   }
 })();
 
