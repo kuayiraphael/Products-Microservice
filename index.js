@@ -17,7 +17,7 @@ app.use(cors());
 app.use(express.static(__dirname + "/public"));
 
 // Initialize the app
-(async function initializeApp() {
+async function initializeApp() {
   try {
     await mongoose.connect(process.env.DB_URI);
     print("Connected to Product DB");
@@ -25,7 +25,6 @@ app.use(express.static(__dirname + "/public"));
     const channel = await CreateChannel();
 
     await productRoutes(app, channel);
-    await cartRoutes(app);
     // appEvents(app);
     app.get("/health", (req, res) => {
       res.send("Product Service Running");
@@ -33,7 +32,9 @@ app.use(express.static(__dirname + "/public"));
   } catch (err) {
     console.log("Failed to start app:", err);
   }
-})();
+}
+
+initializeApp();
 
 // Export the app for Vercel
 module.exports = app;
