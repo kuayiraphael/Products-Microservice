@@ -1,35 +1,37 @@
-const express = require("express");
+// const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+const { CreateChannel } = require("./utils");
+const productRoutes = require("./api/products");
+const cartRoutes = require("./api/cart");
+require("dotenv").config();
 
 const app = express();
-const mongoose = require("mongoose");
-const print = console.log;
-const cors = require("cors");
-const appEvents = require("./api/app-events");
-const productRoutes = require("./api/products");
+
+// Middleware
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.use(express.static(__dirname + "/public"));
 
-const { CreateChannel, SubscribeMessage } = require("./utils");
-
-require("dotenv").config();
-app.use(express.urlencoded({ extended: true }));
-
-async function startApp() {
+// Initialize the app
+(async function initializeApp() {
   try {
-    await mongoose.connect(process.env.DB_URI);
-    print("Connected to Product DB");
+    await mongoose.connect(process.env.DB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+    console.log("Connected to Product DB");
 
     const channel = await CreateChannel();
 
     await productRoutes(app, channel);
-    // appEvents(app);
-    app.listen(8002, () => {
-      console.log("Customer is Listening to Port 8002");
+    await cartRoutes(app);
+
+    app.get("/", (req, res) => {
+      res.send("Product Service Running");
     });
   } catch (err) {
-    console.log("Failed to start app:", err);
+    console.error("Failed to initialize app:", err);
   }
-}
+})();
 
-startApp();
+// Export the app for Vercel
+module.exports = app;
